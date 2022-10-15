@@ -52,4 +52,46 @@ for (const i of resultStore) {
   }
   structStore.push(tempStruct)
 }
+
+structStore.splice(0, 1)
 console.log(structStore)
+// console.log(sample_book_data)
+const finalResult: GenreWordPoints[] = []
+const originalPVal: number[] = []
+
+for (const struct of structStore) {
+  originalPVal.push(struct.points)
+}
+console.log(originalPVal)
+
+function customFind (obj1: GenreWordPoints, place: GenreWordPoints[]): number {
+  for (let i = 0; i < place.length; i++) {
+    if (obj1.genre === place[i].genre && obj1.keyword === place[i].keyword) {
+      return i
+    }
+  }
+  return -1
+}
+
+for (const i of info) {
+  for (let j = 0; j < structStore.length; j++) {
+    const match = structStore[j].keyword
+    if (i.description.includes(match)) {
+      if (finalResult.find((obj) => {
+        return obj.keyword === structStore[j].keyword
+      })) {
+        const repl: GenreWordPoints = {
+          genre: structStore[j].genre,
+          keyword: structStore[j].keyword,
+          points: structStore[j].points + originalPVal[j]
+        }
+        const index = customFind(structStore[j], finalResult)
+        finalResult.splice(index, 1, repl)
+      } else {
+        finalResult.push(structStore[j])
+      }
+    }
+  }
+}
+
+console.log(finalResult)

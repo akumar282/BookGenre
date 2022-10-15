@@ -10,51 +10,31 @@ type GenreWordPoints = {
 }
 
 const info = sample_book_data
-const csvData : any[] = []
-const structStore: GenreWordPoints[] = [];
+const resultStore : any[] = []
+const structStore: GenreWordPoints[] = []
 
-(async () => {
-  fs.createReadStream('sample_genre_keyword_value.csv').pipe(parse({ delimiter: ',' }))
-    .on('data', function (csvrow) {
-      csvData.push(csvrow)
-    }).on('end', function () {
-      const tempStruct: GenreWordPoints = {}
-      for (const ind of csvData) {
-        tempStruct.genre = ind[0]
-        tempStruct.keyword = ind[1]
-        tempStruct.points = +ind[2]
-        structStore.push(tempStruct)
-        console.log(tempStruct)
-      }
-    })
-})()
-
-function parseCSV (file:string) {
-  const csvData : any[] = []
-  return new Promise(function (resolve, reject) {
-    fs.createReadStream(file)
-      .pipe(
-        parse({
-          delimiter: ','
-        })
-      )
-      .on('data', async (csvrow) => {
-        csvData.push(csvrow)
+async function readFile (filePath: string) {
+  return new Promise((resolve, reject) => {
+    fs.createReadStream(filePath)
+      .pipe(parse({ delimiter: ',' }))
+      .on('data', (data) => {
+        resultStore.push(data)
       })
-      .on('end', async () => {
-        const tempStruct: GenreWordPoints = {}
-        for (const ind of csvData) {
-          tempStruct.genre = ind[0]
-          tempStruct.keyword = ind[1]
-          tempStruct.points = +ind[2]
-          structStore.push(tempStruct)
-          console.log(tempStruct)
-        }
-      })
-      .on('error', (err) => {
-        reject(err)
+      .on('error', (_error) => reject(resultStore))
+      .on('end', () => {
+        resolve(resultStore)
       })
   })
+}
+
+const filePath = 'sample_genre_keyword_value.csv'
+
+try {
+  const infoword = await readFile(filePath).then(function (result) {
+  })
+  // console.log(infoword + 'this?')
+} catch (e) {
+  console.log(e + 'this1?')
 }
 
 for (const i of info) {
@@ -62,4 +42,14 @@ for (const i of info) {
   i.description = i.description.replace(/[^a-z0-9 ]/gi, '')
 }
 
-console.log(structStore[1])
+console.log(resultStore)
+
+for (const i of resultStore) {
+  const tempStruct: GenreWordPoints = {
+    genre: i[0],
+    keyword: i[1],
+    points: +i[2]
+  }
+  structStore.push(tempStruct)
+}
+console.log(structStore)

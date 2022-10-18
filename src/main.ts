@@ -7,6 +7,13 @@ type GenreWordPoints = {
   genre: string
   keyword: string
   points: number
+  book?: string
+  firstPVal?: number
+}
+
+type BookResult = {
+  title: string
+  results: GenreWordPoints
 }
 
 const info = sample_book_data
@@ -83,15 +90,18 @@ for (const i of info) {
         const repl: GenreWordPoints = {
           genre: structStore[j].genre,
           keyword: structStore[j].keyword,
-          points: structStore[j].points + originalPVal[j]
+          points: structStore[j].points + originalPVal[j],
+          book: i.title,
+          firstPVal: originalPVal[j]
         }
         const index = customFind(structStore[j], finalResult)
         finalResult.splice(index, 1, repl)
       } else {
+        structStore[j].book = i.title
+        structStore[j].firstPVal = originalPVal[j]
         finalResult.push(structStore[j])
       }
     }
   }
 }
-
 console.log(finalResult)
